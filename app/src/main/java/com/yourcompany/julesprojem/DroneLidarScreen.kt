@@ -39,7 +39,7 @@ fun DroneLidarScreen() {
                     Spacer(modifier = Modifier.height(16.dp))
                     DropdownSelector(
                         label = "Drone Seçimi",
-                        options = drones,
+                        options = drones.map { it to it },
                         selectedOption = selectedDrone,
                         onOptionSelected = { selectedDrone = it }
                     )

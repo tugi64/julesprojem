@@ -40,7 +40,7 @@ fun MapLayersScreen() {
                     Spacer(modifier = Modifier.height(16.dp))
                     DropdownSelector(
                         label = "Harita Seçimi",
-                        options = baseMaps,
+                        options = baseMaps.map { it to it },
                         selectedOption = selectedBaseMap,
                         onOptionSelected = { selectedBaseMap = it }
                     )

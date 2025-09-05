@@ -44,7 +44,7 @@ fun RadioSettingsScreen() {
                     Spacer(modifier = Modifier.height(16.dp))
                     DropdownSelector(
                         label = "Telsiz Marka/Model",
-                        options = radios,
+                        options = radios.map { it to it },
                         selectedOption = selectedRadio,
                         onOptionSelected = { selectedRadio = it }
                     )
@@ -64,7 +64,7 @@ fun RadioSettingsScreen() {
                     Spacer(modifier = Modifier.height(16.dp))
                     DropdownSelector(
                         label = "Seri Port Hızı (Baud Rate)",
-                        options = baudRates,
+                        options = baudRates.map { it to it },
                         selectedOption = baudRate,
                         onOptionSelected = { baudRate = it }
                     )

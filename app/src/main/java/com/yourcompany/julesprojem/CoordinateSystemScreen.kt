@@ -43,14 +43,14 @@ fun CoordinateSystemScreen() {
                     Spacer(modifier = Modifier.height(16.dp))
                     DropdownSelector(
                         label = "Datum",
-                        options = datums,
+                        options = datums.map { it to it },
                         selectedOption = selectedDatum,
                         onOptionSelected = { selectedDatum = it }
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     DropdownSelector(
                         label = "Projeksiyon Sistemi",
-                        options = projections,
+                        options = projections.map { it to it },
                         selectedOption = selectedProjection,
                         onOptionSelected = { selectedProjection = it }
                     )
