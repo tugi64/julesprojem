@@ -7,6 +7,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.yourcompany.julesprojem.ui.theme.JulesprojemTheme
@@ -20,7 +21,7 @@ fun MapLayersScreen() {
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Harita Katmanları") },
+                title = { Text(stringResource(R.string.map_layers)) },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primaryContainer,
                     titleContentColor = MaterialTheme.colorScheme.primary,
@@ -36,10 +37,10 @@ fun MapLayersScreen() {
         ) {
             Card(modifier = Modifier.fillMaxWidth()) {
                 Column(modifier = Modifier.padding(16.dp)) {
-                    Text("Altlık Harita", style = MaterialTheme.typography.titleMedium)
+                    Text(stringResource(R.string.base_map), style = MaterialTheme.typography.titleMedium)
                     Spacer(modifier = Modifier.height(16.dp))
                     DropdownSelector(
-                        label = "Harita Seçimi",
+                        label = stringResource(R.string.map_selection),
                         options = baseMaps.map { it to it },
                         selectedOption = selectedBaseMap,
                         onOptionSelected = { selectedBaseMap = it }
@@ -47,11 +48,11 @@ fun MapLayersScreen() {
                 }
             }
             Spacer(modifier = Modifier.height(16.dp))
-            LayerList(title = "Raster Katmanlar", layers = listOf("Ortofoto 2023", "Halihazır Harita"))
+            LayerList(title = stringResource(R.string.raster_layers), layers = listOf("Ortofoto 2023", "Halihazır Harita"))
             Spacer(modifier = Modifier.height(16.dp))
-            LayerList(title = "CAD Dosyaları", layers = listOf("proje.dxf", "parsel.dwg"))
+            LayerList(title = stringResource(R.string.cad_files), layers = listOf("proje.dxf", "parsel.dwg"))
             Spacer(modifier = Modifier.height(16.dp))
-            LayerList(title = "Vektör Katmanlar", layers = listOf("yollar.shp", "binalar.kml"))
+            LayerList(title = stringResource(R.string.vector_layers), layers = listOf("yollar.shp", "binalar.kml"))
         }
     }
 }

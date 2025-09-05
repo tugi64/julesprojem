@@ -29,6 +29,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        LanguageManager.loadLocale(this)
         enableEdgeToEdge()
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
@@ -64,6 +65,7 @@ class MainActivity : ComponentActivity() {
                     composable("lidar") { DroneLidarScreen() }
                     composable("radio") { RadioSettingsScreen() }
                     composable("files") { FileManagerRoute() }
+                    composable("settings") { SettingsScreen() }
                 }
             }
         }

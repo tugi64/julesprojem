@@ -9,6 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.yourcompany.julesprojem.ui.theme.JulesprojemTheme
@@ -22,22 +23,22 @@ data class CadAction(
 @Composable
 fun ApplicationScreen() {
     val applicationActions = listOf(
-        CadAction("Nokta", Icons.Default.LocationOn),
-        CadAction("Hat", Icons.Default.Timeline),
-        CadAction("En Kesit", Icons.Default.Stairs),
+        CadAction(stringResource(R.string.stakeout_point), Icons.Default.LocationOn),
+        CadAction(stringResource(R.string.stakeout_line), Icons.Default.Timeline),
+        CadAction(stringResource(R.string.stakeout_cross_section), Icons.Default.Stairs),
     )
     val cadTools = listOf(
-        CadAction("Snap End", Icons.Default.AddLocation),
-        CadAction("Snap Mid", Icons.Default.AddLocationAlt),
-        CadAction("Cetvel", Icons.Default.SquareFoot),
-        CadAction("Tolerans", Icons.Default.ControlPointDuplicate),
-        CadAction("Dokun", Icons.Default.TouchApp),
+        CadAction(stringResource(R.string.snap_end), Icons.Default.AddLocation),
+        CadAction(stringResource(R.string.snap_mid), Icons.Default.AddLocationAlt),
+        CadAction(stringResource(R.string.ruler), Icons.Default.SquareFoot),
+        CadAction(stringResource(R.string.tolerance), Icons.Default.ControlPointDuplicate),
+        CadAction(stringResource(R.string.touch), Icons.Default.TouchApp),
     )
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Aplikasyon") },
+                title = { Text(stringResource(R.string.application)) },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primaryContainer,
                     titleContentColor = MaterialTheme.colorScheme.primary,
@@ -57,7 +58,7 @@ fun ApplicationScreen() {
                     .background(MaterialTheme.colorScheme.surfaceVariant),
                 contentAlignment = Alignment.Center
             ) {
-                Text("Harita/CAD Alanı", style = MaterialTheme.typography.headlineMedium)
+                Text(stringResource(R.string.map_cad_area), style = MaterialTheme.typography.headlineMedium)
             }
 
             // Application Actions Toolbar

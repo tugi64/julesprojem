@@ -11,6 +11,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -45,7 +46,7 @@ fun GnssConnectionScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("GNSS Bağlantısı") },
+                title = { Text(stringResource(R.string.gnss_connection)) },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primaryContainer,
                     titleContentColor = MaterialTheme.colorScheme.primary,
@@ -79,17 +80,17 @@ fun GnssConnectionScreen(
             // GNSS Device Selection
             Card(modifier = Modifier.fillMaxWidth()) {
                 Column(modifier = Modifier.padding(16.dp)) {
-                    Text("Cihaz Ayarları", style = MaterialTheme.typography.titleMedium)
+                    Text(stringResource(R.string.device_settings), style = MaterialTheme.typography.titleMedium)
                     Spacer(modifier = Modifier.height(16.dp))
                     DropdownSelector(
-                        label = "Üretici",
+                        label = stringResource(R.string.manufacturer),
                         options = uiState.manufacturers.map { it to it },
                         selectedOption = uiState.selectedManufacturer,
                         onOptionSelected = { uiState.selectedManufacturer = it }
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     DropdownSelector(
-                        label = "Model",
+                        label = stringResource(R.string.model),
                         options = uiState.models.map { it to it },
                         selectedOption = uiState.selectedModel,
                         onOptionSelected = { uiState.selectedModel = it }
@@ -98,7 +99,7 @@ fun GnssConnectionScreen(
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Box(modifier = Modifier.weight(1f)) {
                             DropdownSelector(
-                                label = "Bluetooth Cihazı",
+                                label = stringResource(R.string.bluetooth_device),
                                 options = uiState.bluetoothDevices.value,
                                 selectedOption = uiState.selectedBluetoothDevice,
                                 onOptionSelected = { uiState.selectedBluetoothDevice = it }
@@ -110,7 +111,7 @@ fun GnssConnectionScreen(
                                 CircularProgressIndicator(modifier = Modifier.size(24.dp).align(Alignment.Center))
                             } else {
                                 IconButton(onClick = onScanClicked) {
-                                    Icon(Icons.Default.Refresh, contentDescription = "Scan for devices")
+                                    Icon(Icons.Default.Refresh, contentDescription = stringResource(R.string.scan_for_devices))
                                 }
                             }
                         }
@@ -122,10 +123,10 @@ fun GnssConnectionScreen(
             // Connection Mode
             Card(modifier = Modifier.fillMaxWidth()) {
                 Column(modifier = Modifier.padding(16.dp)) {
-                    Text("Ölçüm Modu", style = MaterialTheme.typography.titleMedium)
+                    Text(stringResource(R.string.measurement_mode), style = MaterialTheme.typography.titleMedium)
                     Spacer(modifier = Modifier.height(16.dp))
                     DropdownSelector(
-                        label = "Mod",
+                        label = stringResource(R.string.mode),
                         options = uiState.rtkModes.map { it to it },
                         selectedOption = uiState.rtkMode,
                         onOptionSelected = { uiState.rtkMode = it }
@@ -137,15 +138,15 @@ fun GnssConnectionScreen(
             // CORS Settings
             Card(modifier = Modifier.fillMaxWidth()) {
                 Column(modifier = Modifier.padding(16.dp)) {
-                    Text("CORS (NTRIP) Ayarları", style = MaterialTheme.typography.titleMedium)
+                    Text(stringResource(R.string.cors_ntrip_settings), style = MaterialTheme.typography.titleMedium)
                     Spacer(modifier = Modifier.height(16.dp))
-                    OutlinedTextField(value = uiState.corsHost, onValueChange = { uiState.corsHost = it }, label = { Text("Host") }, modifier = Modifier.fillMaxWidth())
+                    OutlinedTextField(value = uiState.corsHost, onValueChange = { uiState.corsHost = it }, label = { Text(stringResource(R.string.host)) }, modifier = Modifier.fillMaxWidth())
                     Spacer(modifier = Modifier.height(8.dp))
-                    OutlinedTextField(value = uiState.corsPort, onValueChange = { uiState.corsPort = it }, label = { Text("Port") }, modifier = Modifier.fillMaxWidth())
+                    OutlinedTextField(value = uiState.corsPort, onValueChange = { uiState.corsPort = it }, label = { Text(stringResource(R.string.port)) }, modifier = Modifier.fillMaxWidth())
                     Spacer(modifier = Modifier.height(8.dp))
-                    OutlinedTextField(value = uiState.corsUser, onValueChange = { uiState.corsUser = it }, label = { Text("Kullanıcı Adı") }, modifier = Modifier.fillMaxWidth())
+                    OutlinedTextField(value = uiState.corsUser, onValueChange = { uiState.corsUser = it }, label = { Text(stringResource(R.string.username)) }, modifier = Modifier.fillMaxWidth())
                     Spacer(modifier = Modifier.height(8.dp))
-                    OutlinedTextField(value = uiState.corsPass, onValueChange = { uiState.corsPass = it }, label = { Text("Şifre") }, modifier = Modifier.fillMaxWidth())
+                    OutlinedTextField(value = uiState.corsPass, onValueChange = { uiState.corsPass = it }, label = { Text(stringResource(R.string.password)) }, modifier = Modifier.fillMaxWidth())
                 }
             }
             Spacer(modifier = Modifier.height(16.dp))
@@ -156,9 +157,9 @@ fun GnssConnectionScreen(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text("Durum: ${uiState.connectionStatus}", style = MaterialTheme.typography.bodyLarge)
+                Text("${stringResource(R.string.status)}: ${uiState.connectionStatus}", style = MaterialTheme.typography.bodyLarge)
                 Button(onClick = onConnectClicked) {
-                    Text("BAĞLAN")
+                    Text(stringResource(R.string.connect))
                 }
             }
         }

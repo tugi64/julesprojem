@@ -10,6 +10,7 @@ mockito = "5.12.0"
 coroutinesTest = "1.8.1"
 osmdroid = "6.1.20"
 gson = "2.13.1"
+appcompat = "1.7.1"
 activityCompose = "1.10.1"
 composeBom = "2024.09.00"
 navigationCompose = "2.8.0-beta05"
@@ -36,6 +37,7 @@ mockito-core = { group = "org.mockito", name = "mockito-core", version.ref = "mo
 kotlinx-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "coroutinesTest" }
 osmdroid-android = { group = "org.osmdroid", name = "osmdroid-android", version.ref = "osmdroid" }
 gson = { group = "com.google.code.gson", name = "gson", version.ref = "gson" }
+androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

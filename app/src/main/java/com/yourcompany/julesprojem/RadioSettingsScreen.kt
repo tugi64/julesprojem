@@ -6,6 +6,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.yourcompany.julesprojem.ui.theme.JulesprojemTheme
@@ -24,7 +25,7 @@ fun RadioSettingsScreen() {
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Telsiz Ayarları") },
+                title = { Text(stringResource(R.string.radio_settings)) },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primaryContainer,
                     titleContentColor = MaterialTheme.colorScheme.primary,
@@ -40,10 +41,10 @@ fun RadioSettingsScreen() {
         ) {
             Card(modifier = Modifier.fillMaxWidth()) {
                 Column(modifier = Modifier.padding(16.dp)) {
-                    Text("Telsiz Modeli ve Frekans", style = MaterialTheme.typography.titleMedium)
+                    Text(stringResource(R.string.radio_model_and_frequency), style = MaterialTheme.typography.titleMedium)
                     Spacer(modifier = Modifier.height(16.dp))
                     DropdownSelector(
-                        label = "Telsiz Marka/Model",
+                        label = stringResource(R.string.radio_brand_model),
                         options = radios.map { it to it },
                         selectedOption = selectedRadio,
                         onOptionSelected = { selectedRadio = it }
@@ -52,7 +53,7 @@ fun RadioSettingsScreen() {
                     OutlinedTextField(
                         value = frequency,
                         onValueChange = { frequency = it },
-                        label = { Text("Frekans (MHz)") },
+                        label = { Text(stringResource(R.string.frequency_mhz)) },
                         modifier = Modifier.fillMaxWidth()
                     )
                 }
@@ -60,10 +61,10 @@ fun RadioSettingsScreen() {
             Spacer(modifier = Modifier.height(16.dp))
             Card(modifier = Modifier.fillMaxWidth()) {
                 Column(modifier = Modifier.padding(16.dp)) {
-                    Text("Bağlantı Ayarları", style = MaterialTheme.typography.titleMedium)
+                    Text(stringResource(R.string.connection_settings), style = MaterialTheme.typography.titleMedium)
                     Spacer(modifier = Modifier.height(16.dp))
                     DropdownSelector(
-                        label = "Seri Port Hızı (Baud Rate)",
+                        label = stringResource(R.string.serial_port_baud_rate),
                         options = baudRates.map { it to it },
                         selectedOption = baudRate,
                         onOptionSelected = { baudRate = it }
@@ -74,14 +75,14 @@ fun RadioSettingsScreen() {
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = androidx.compose.ui.Alignment.CenterVertically
                     ) {
-                        Text("Röle Modu (Repeater)")
+                        Text(stringResource(R.string.repeater_mode))
                         Switch(checked = repeaterMode, onCheckedChange = { repeaterMode = it })
                     }
                 }
             }
              Spacer(modifier = Modifier.height(16.dp))
             Button(onClick = { /* TODO */ }) {
-                Text("Telsiz Durum Kontrolü")
+                Text(stringResource(R.string.radio_status_check))
             }
         }
     }

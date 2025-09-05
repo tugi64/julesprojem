@@ -6,6 +6,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.yourcompany.julesprojem.ui.theme.JulesprojemTheme
@@ -19,7 +20,7 @@ fun DroneLidarScreen() {
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Drone LiDAR") },
+                title = { Text(stringResource(R.string.drone_lidar)) },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primaryContainer,
                     titleContentColor = MaterialTheme.colorScheme.primary,
@@ -35,10 +36,10 @@ fun DroneLidarScreen() {
         ) {
             Card(modifier = Modifier.fillMaxWidth()) {
                 Column(modifier = Modifier.padding(16.dp)) {
-                    Text("Drone ve Sensör", style = MaterialTheme.typography.titleMedium)
+                    Text(stringResource(R.string.drone_and_sensor), style = MaterialTheme.typography.titleMedium)
                     Spacer(modifier = Modifier.height(16.dp))
                     DropdownSelector(
-                        label = "Drone Seçimi",
+                        label = stringResource(R.string.drone_selection),
                         options = drones.map { it to it },
                         selectedOption = selectedDrone,
                         onOptionSelected = { selectedDrone = it }
@@ -49,18 +50,18 @@ fun DroneLidarScreen() {
             Spacer(modifier = Modifier.height(16.dp))
             Card(modifier = Modifier.fillMaxWidth()) {
                 Column(modifier = Modifier.padding(16.dp)) {
-                    Text("Uçuş Planı ve Veri", style = MaterialTheme.typography.titleMedium)
+                    Text(stringResource(R.string.flight_plan_and_data), style = MaterialTheme.typography.titleMedium)
                     Spacer(modifier = Modifier.height(16.dp))
                     Button(onClick = { /* TODO */ }) {
-                        Text("Uçuş Planı Yükle")
+                        Text(stringResource(R.string.load_flight_plan))
                     }
                     Spacer(modifier = Modifier.height(8.dp))
                     Button(onClick = { /* TODO */ }) {
-                        Text("Verileri İçe Aktar")
+                        Text(stringResource(R.string.import_data))
                     }
                     Spacer(modifier = Modifier.height(8.dp))
                     Button(onClick = { /* TODO */ }) {
-                        Text("Nokta Bulutu Önizleme")
+                        Text(stringResource(R.string.point_cloud_preview))
                     }
                 }
             }

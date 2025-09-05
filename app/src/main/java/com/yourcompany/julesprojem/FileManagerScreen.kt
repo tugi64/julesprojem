@@ -12,6 +12,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -41,10 +42,10 @@ fun FileManagerScreen(viewModel: FileManagerViewModel) {
             TopAppBar(
                 title = {
                     Column {
-                        Text("Proje Yönetimi")
+                        Text(stringResource(R.string.file_management))
                         activeProject?.let {
                             Text(
-                                text = "Aktif: ${it.name}",
+                                text = stringResource(R.string.active_project, it.name),
                                 style = MaterialTheme.typography.bodySmall
                             )
                         }
@@ -58,7 +59,7 @@ fun FileManagerScreen(viewModel: FileManagerViewModel) {
         },
         floatingActionButton = {
             FloatingActionButton(onClick = { showNewProjectDialog = true }) {
-                Icon(Icons.Default.CreateNewFolder, contentDescription = "Yeni Proje")
+                Icon(Icons.Default.CreateNewFolder, contentDescription = stringResource(R.string.new_project))
             }
         }
     ) { paddingValues ->
@@ -80,12 +81,12 @@ fun FileManagerScreen(viewModel: FileManagerViewModel) {
                         leadingContent = {
                             Icon(
                                 Icons.Default.Folder,
-                                contentDescription = "Proje"
+                                contentDescription = stringResource(R.string.project_files)
                             )
                         },
                         trailingContent = {
                             IconButton(onClick = { viewModel.deleteProject(projectName) }) {
-                                Icon(Icons.Default.Delete, contentDescription = "Sil")
+                                Icon(Icons.Default.Delete, contentDescription = stringResource(R.string.delete))
                             }
                         },
                         modifier = Modifier.clickable { viewModel.openProject(projectName) }
@@ -105,12 +106,12 @@ private fun NewProjectDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Yeni Proje Oluştur") },
+        title = { Text(stringResource(R.string.create_new_project)) },
         text = {
             OutlinedTextField(
                 value = projectName,
                 onValueChange = { projectName = it },
-                label = { Text("Proje Adı") },
+                label = { Text(stringResource(R.string.project_name)) },
                 singleLine = true
             )
         },
@@ -122,12 +123,12 @@ private fun NewProjectDialog(
                     }
                 }
             ) {
-                Text("Oluştur")
+                Text(stringResource(R.string.create))
             }
         },
         dismissButton = {
             Button(onClick = onDismiss) {
-                Text("İptal")
+                Text(stringResource(R.string.cancel))
             }
         }
     )

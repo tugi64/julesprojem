@@ -12,6 +12,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
@@ -46,32 +47,32 @@ fun MeasurementScreen(viewModel: GnssViewModel) {
     val ggaData by viewModel.ggaData.collectAsState()
 
     val measurementActions = listOf(
-        MeasurementAction("Nokta", Icons.Default.LocationOn),
-        MeasurementAction("Detay", Icons.AutoMirrored.Filled.List),
-        MeasurementAction("Fotogrametri", Icons.Default.CameraAlt),
-        MeasurementAction("Lazer", Icons.Default.SquareFoot),
-        MeasurementAction("Hat", Icons.Default.Timeline),
-        MeasurementAction("En Kesit", Icons.Default.Stairs),
+        MeasurementAction(stringResource(R.string.point), Icons.Default.LocationOn),
+        MeasurementAction(stringResource(R.string.detail), Icons.AutoMirrored.Filled.List),
+        MeasurementAction(stringResource(R.string.photogrammetry), Icons.Default.CameraAlt),
+        MeasurementAction(stringResource(R.string.laser), Icons.Default.SquareFoot),
+        MeasurementAction(stringResource(R.string.line), Icons.Default.Timeline),
+        MeasurementAction(stringResource(R.string.cross_section), Icons.Default.Stairs),
     )
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Ölçüm") },
+                title = { Text(stringResource(R.string.measurement)) },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primaryContainer,
                     titleContentColor = MaterialTheme.colorScheme.primary,
                 ),
                 actions = {
                     IconButton(onClick = { /* TODO: Settings */ }) {
-                        Icon(Icons.Default.Settings, contentDescription = "Ayarlar")
+                        Icon(Icons.Default.Settings, contentDescription = stringResource(R.string.settings))
                     }
                 }
             )
         },
         floatingActionButton = {
             FloatingActionButton(onClick = { /* TODO: Main measurement action */ }) {
-                Icon(Icons.Default.MyLocation, contentDescription = "Ölçüm Yap")
+                Icon(Icons.Default.MyLocation, contentDescription = stringResource(R.string.measure))
             }
         }
     ) { paddingValues ->
