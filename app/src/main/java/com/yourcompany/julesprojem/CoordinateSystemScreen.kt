@@ -1,22 +1,32 @@
 package com.yourcompany.julesprojem
 
+import android.app.Application
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.yourcompany.julesprojem.ui.theme.JulesprojemTheme
+
+@Composable
+fun CoordinateSystemRoute(
+    viewModel: CoordinateSystemViewModel = viewModel(
+        factory = CoordinateSystemViewModel.CoordinateSystemViewModelFactory(
+            LocalContext.current.applicationContext as Application
+        )
+    )
+) {
+    CoordinateSystemScreen(viewModel)
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CoordinateSystemScreen() {
-    var selectedDatum by remember { mutableStateOf("ITRF96") }
-    var selectedProjection by remember { mutableStateOf("UTM") }
-    var dom by remember { mutableStateOf("") }
-
+fun CoordinateSystemScreen(viewModel: CoordinateSystemViewModel) {
     val datums = listOf("ITRF96", "ED50", "WGS84")
     val projections = listOf("UTM", "3 Derece", "Lambert")
 
@@ -27,7 +37,12 @@ fun CoordinateSystemScreen() {
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primaryContainer,
                     titleContentColor = MaterialTheme.colorScheme.primary,
-                )
+                ),
+                actions = {
+                    Button(onClick = { viewModel.saveCoordinateSystem() }) {
+                        Text("Kaydet")
+                    }
+                }
             )
         }
     ) { paddingValues ->
@@ -44,20 +59,20 @@ fun CoordinateSystemScreen() {
                     DropdownSelector(
                         label = "Datum",
                         options = datums.map { it to it },
-                        selectedOption = selectedDatum,
-                        onOptionSelected = { selectedDatum = it }
+                        selectedOption = viewModel.selectedDatum,
+                        onOptionSelected = { viewModel.selectedDatum = it }
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     DropdownSelector(
                         label = "Projeksiyon Sistemi",
                         options = projections.map { it to it },
-                        selectedOption = selectedProjection,
-                        onOptionSelected = { selectedProjection = it }
+                        selectedOption = viewModel.selectedProjection,
+                        onOptionSelected = { viewModel.selectedProjection = it }
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     OutlinedTextField(
-                        value = dom,
-                        onValueChange = { dom = it },
+                        value = viewModel.dom,
+                        onValueChange = { viewModel.dom = it },
                         label = { Text("Orta Meridyen (DOM)") },
                         modifier = Modifier.fillMaxWidth()
                     )
@@ -81,6 +96,6 @@ fun CoordinateSystemScreen() {
 @Composable
 fun CoordinateSystemScreenPreview() {
     JulesprojemTheme {
-        CoordinateSystemScreen()
+        // CoordinateSystemScreen(viewModel = ...)
     }
 }

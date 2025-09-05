@@ -16,6 +16,8 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.yourcompany.julesprojem.ui.theme.JulesprojemTheme
 import java.util.Locale
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 
 @Composable
 fun GnssConnectionRoute(
@@ -58,7 +60,8 @@ fun GnssConnectionScreen(
                 .verticalScroll(rememberScrollState())
         ) {
             // Live Data Display
-            uiState.ggaData?.let { data ->
+            val ggaData by uiState.ggaData.collectAsState()
+            ggaData?.let { data ->
                 Card(modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp)) {
                     Column(modifier = Modifier.padding(16.dp)) {
                         Text("Canlı Konum Verisi", style = MaterialTheme.typography.titleMedium)
@@ -173,7 +176,7 @@ interface GnssUiState {
     var corsPass: String
     val connectionStatus: String
     val isScanning: Boolean
-    val ggaData: GgaData?
+    val ggaData: StateFlow<GgaData?>
     val manufacturers: List<String>
     val models: List<String>
     val bluetoothDevices: State<List<Pair<String, String>>>
@@ -232,7 +235,7 @@ class FakeGnssUiState : GnssUiState {
     override var corsPass by mutableStateOf("fakepass")
     override val connectionStatus by mutableStateOf("Not Connected")
     override val isScanning by mutableStateOf(false)
-    override var ggaData by mutableStateOf<GgaData?>(null)
+    override val ggaData = MutableStateFlow<GgaData?>(null)
     override val manufacturers = listOf("Fake Manufacturer", "Another Fake")
     override val models = listOf("Fake Model 1", "Fake Model 2")
     override val bluetoothDevices = mutableStateOf(listOf("Fake BT 1" to "00:11:22:33:44:55", "Fake BT 2" to "AA:BB:CC:DD:EE:FF"))

@@ -11,6 +11,8 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -33,7 +35,9 @@ class GnssViewModel(
     override var corsPass by mutableStateOf("pass")
     override var connectionStatus by mutableStateOf("Bağlı Değil")
     override var isScanning by mutableStateOf(false)
-    override var ggaData by mutableStateOf<GgaData?>(null)
+
+    private val _ggaData = MutableStateFlow<GgaData?>(null)
+    override val ggaData: StateFlow<GgaData?> = _ggaData
 
 
     override val manufacturers = listOf("South", "Trimble", "Topcon", "Hi-Target", "Sokkia", "Leica")
@@ -97,8 +101,8 @@ class GnssViewModel(
                             if (line != null) {
                                 val parsedData = nmeaParser.parseGga(line)
                                 if (parsedData != null) {
+                                    _ggaData.value = parsedData
                                     withContext(Dispatchers.Main) {
-                                        ggaData = parsedData
                                         connectionStatus = "Veri alınıyor..."
                                     }
                                 }

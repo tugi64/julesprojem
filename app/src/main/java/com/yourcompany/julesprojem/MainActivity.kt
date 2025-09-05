@@ -57,13 +57,13 @@ class MainActivity : ComponentActivity() {
                         MainScreen(navController)
                     }
                     composable("gnss") { GnssConnectionRoute() }
-                    composable("measurement") { MeasurementScreen() }
+                    composable("measurement") { MeasurementRoute() }
                     composable("application") { ApplicationScreen() }
-                    composable("coords") { CoordinateSystemScreen() }
+                    composable("coords") { CoordinateSystemRoute() }
                     composable("layers") { MapLayersScreen() }
                     composable("lidar") { DroneLidarScreen() }
                     composable("radio") { RadioSettingsScreen() }
-                    composable("files") { FileManagerScreen() }
+                    composable("files") { FileManagerRoute() }
                 }
             }
         }
