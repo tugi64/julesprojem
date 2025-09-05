@@ -59,12 +59,12 @@ class MainActivity : ComponentActivity() {
                     }
                     composable("gnss") { GnssConnectionRoute() }
                     composable("measurement") { MeasurementRoute() }
-                    composable("application") { ApplicationScreen() }
+                    composable("application") { ApplicationRoute() }
                     composable("coords") { CoordinateSystemRoute() }
                     composable("layers") { MapLayersScreen() }
                     composable("lidar") { DroneLidarScreen() }
                     composable("radio") { RadioSettingsScreen() }
-                    composable("files") { FileManagerRoute() }
+                    composable("files") { FileManagerRoute(navController) }
                     composable("settings") { SettingsScreen() }
                 }
             }

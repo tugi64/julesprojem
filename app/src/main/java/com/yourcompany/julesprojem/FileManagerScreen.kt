@@ -9,6 +9,7 @@ import androidx.compose.material.icons.filled.CreateNewFolder
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Folder
 import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.filled.PinDrop
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -17,19 +18,30 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 import com.yourcompany.julesprojem.ui.theme.JulesprojemTheme
 
 @Composable
 fun FileManagerRoute(
+    navController: NavController,
     viewModel: FileManagerViewModel = viewModel()
 ) {
-    FileManagerScreen(viewModel)
+    FileManagerScreen(
+        viewModel = viewModel,
+        onStakeoutClicked = { point ->
+            ProjectRepository.setStakeoutTarget(point)
+            navController.navigate("application")
+        }
+    )
 }
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun FileManagerScreen(viewModel: FileManagerViewModel) {
+fun FileManagerScreen(
+    viewModel: FileManagerViewModel,
+    onStakeoutClicked: (Point) -> Unit
+) {
     val projects by viewModel.projects.collectAsState()
     val activeProject by viewModel.activeProject.collectAsState()
     var showNewProjectDialog by remember { mutableStateOf(false) }
@@ -88,6 +100,16 @@ fun FileManagerScreen(viewModel: FileManagerViewModel) {
                                     Icons.Default.LocationOn,
                                     contentDescription = "Nokta"
                                 )
+                            },
+                            trailingContent = {
+                                Row {
+                                    IconButton(onClick = { onStakeoutClicked(point) }) {
+                                        Icon(Icons.Default.PinDrop, contentDescription = "Aplikasyon")
+                                    }
+                                    IconButton(onClick = { /* TODO: Delete Point */ }) {
+                                        Icon(Icons.Default.Delete, contentDescription = stringResource(R.string.delete))
+                                    }
+                                }
                             }
                         )
                     }

@@ -17,6 +17,13 @@ object ProjectRepository {
     private val _activeProject = MutableStateFlow<Project?>(null)
     val activeProject = _activeProject.asStateFlow()
 
+    private val _stakeoutTarget = MutableStateFlow<Point?>(null)
+    val stakeoutTarget = _stakeoutTarget.asStateFlow()
+
+    fun setStakeoutTarget(point: Point) {
+        _stakeoutTarget.value = point
+    }
+
     fun init(context: Context) {
         this.context = context
         projectDir = File(context.filesDir, "ProjectData")
