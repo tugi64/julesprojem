@@ -1,7 +1,6 @@
 package com.yourcompany.julesprojem
 
 import android.annotation.SuppressLint
-import android.bluetooth.BluetoothDevice
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -119,6 +118,23 @@ class GnssViewModel(
                 connectionStatus = "Bluetooth bağlantı hatası"
             }
         }
+    }
+
+    fun savePoint() {
+        val currentGga = ggaData.value ?: return
+        val activeProject = ProjectRepository.activeProject.value ?: return
+
+        // For now, we save WGS84 coordinates directly. A real implementation
+        // would require a coordinate transformation based on the project's CRS.
+        val newPoint = Point(
+            name = "Nokta-${activeProject.points.size + 1}",
+            northing = currentGga.latitude,
+            easting = currentGga.longitude,
+            elevation = currentGga.altitude
+        )
+
+        activeProject.points.add(newPoint)
+        ProjectRepository.saveProject(activeProject)
     }
 
     override fun onCleared() {

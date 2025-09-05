@@ -16,11 +16,7 @@ import com.yourcompany.julesprojem.ui.theme.JulesprojemTheme
 
 @Composable
 fun CoordinateSystemRoute(
-    viewModel: CoordinateSystemViewModel = viewModel(
-        factory = CoordinateSystemViewModel.CoordinateSystemViewModelFactory(
-            LocalContext.current.applicationContext as Application
-        )
-    )
+    viewModel: CoordinateSystemViewModel = viewModel()
 ) {
     CoordinateSystemScreen(viewModel)
 }

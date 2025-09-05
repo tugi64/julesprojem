@@ -8,6 +8,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CreateNewFolder
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Folder
+import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -20,11 +21,7 @@ import com.yourcompany.julesprojem.ui.theme.JulesprojemTheme
 
 @Composable
 fun FileManagerRoute(
-    viewModel: FileManagerViewModel = viewModel(
-        factory = FileManagerViewModel.FileManagerViewModelFactory(
-            LocalContext.current.applicationContext as android.app.Application
-        )
-    )
+    viewModel: FileManagerViewModel = viewModel()
 ) {
     FileManagerScreen(viewModel)
 }
@@ -33,8 +30,8 @@ fun FileManagerRoute(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FileManagerScreen(viewModel: FileManagerViewModel) {
-    val projects by viewModel.projects
-    val activeProject by viewModel.activeProject
+    val projects by viewModel.projects.collectAsState()
+    val activeProject by viewModel.activeProject.collectAsState()
     var showNewProjectDialog by remember { mutableStateOf(false) }
 
     Scaffold(
@@ -74,23 +71,48 @@ fun FileManagerScreen(viewModel: FileManagerViewModel) {
                 )
             }
 
-            LazyColumn {
-                items(projects) { projectName ->
-                    ListItem(
-                        headlineContent = { Text(projectName) },
-                        leadingContent = {
-                            Icon(
-                                Icons.Default.Folder,
-                                contentDescription = stringResource(R.string.project_files)
-                            )
-                        },
-                        trailingContent = {
-                            IconButton(onClick = { viewModel.deleteProject(projectName) }) {
-                                Icon(Icons.Default.Delete, contentDescription = stringResource(R.string.delete))
+            if (activeProject == null) {
+                Text("Lütfen bir proje açın veya oluşturun.")
+            } else {
+                LazyColumn {
+                    item {
+                        Text("Proje Noktaları", style = MaterialTheme.typography.titleMedium)
+                        Spacer(modifier = Modifier.height(8.dp))
+                    }
+                    items(activeProject!!.points) { point ->
+                        ListItem(
+                            headlineContent = { Text(point.name) },
+                            supportingContent = { Text("N: ${point.northing}, E: ${point.easting}, H: ${point.elevation}")},
+                            leadingContent = {
+                                Icon(
+                                    Icons.Default.LocationOn,
+                                    contentDescription = "Nokta"
+                                )
                             }
-                        },
-                        modifier = Modifier.clickable { viewModel.openProject(projectName) }
-                    )
+                        )
+                    }
+                    item {
+                        Divider(modifier = Modifier.padding(vertical = 16.dp))
+                        Text("Tüm Projeler", style = MaterialTheme.typography.titleMedium)
+                        Spacer(modifier = Modifier.height(8.dp))
+                    }
+                    items(projects) { projectName ->
+                        ListItem(
+                            headlineContent = { Text(projectName) },
+                            leadingContent = {
+                                Icon(
+                                    Icons.Default.Folder,
+                                    contentDescription = stringResource(R.string.project_files)
+                                )
+                            },
+                            trailingContent = {
+                                IconButton(onClick = { viewModel.deleteProject(projectName) }) {
+                                    Icon(Icons.Default.Delete, contentDescription = stringResource(R.string.delete))
+                                }
+                            },
+                            modifier = Modifier.clickable { viewModel.openProject(projectName) }
+                        )
+                    }
                 }
             }
         }

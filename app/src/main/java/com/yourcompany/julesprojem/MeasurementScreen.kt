@@ -5,9 +5,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -18,6 +16,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.yourcompany.julesprojem.ui.theme.JulesprojemTheme
+import kotlinx.coroutines.launch
 import org.osmdroid.config.Configuration
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.util.GeoPoint
@@ -26,7 +25,8 @@ import org.osmdroid.views.overlay.Marker
 
 data class MeasurementAction(
     val title: String,
-    val icon: ImageVector
+    val icon: ImageVector,
+    val action: () -> Unit
 )
 
 @Composable
@@ -45,17 +45,25 @@ fun MeasurementRoute(
 @Composable
 fun MeasurementScreen(viewModel: GnssViewModel) {
     val ggaData by viewModel.ggaData.collectAsState()
+    val snackbarHostState = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
 
     val measurementActions = listOf(
-        MeasurementAction(stringResource(R.string.point), Icons.Default.LocationOn),
-        MeasurementAction(stringResource(R.string.detail), Icons.AutoMirrored.Filled.List),
-        MeasurementAction(stringResource(R.string.photogrammetry), Icons.Default.CameraAlt),
-        MeasurementAction(stringResource(R.string.laser), Icons.Default.SquareFoot),
-        MeasurementAction(stringResource(R.string.line), Icons.Default.Timeline),
-        MeasurementAction(stringResource(R.string.cross_section), Icons.Default.Stairs),
+        MeasurementAction(stringResource(R.string.point), Icons.Default.LocationOn) {
+            viewModel.savePoint()
+            scope.launch {
+                snackbarHostState.showSnackbar("Nokta kaydedildi!")
+            }
+        },
+        MeasurementAction(stringResource(R.string.detail), Icons.AutoMirrored.Filled.List) { /* TODO */ },
+        MeasurementAction(stringResource(R.string.photogrammetry), Icons.Default.CameraAlt) { /* TODO */ },
+        MeasurementAction(stringResource(R.string.laser), Icons.Default.SquareFoot) { /* TODO */ },
+        MeasurementAction(stringResource(R.string.line), Icons.Default.Timeline) { /* TODO */ },
+        MeasurementAction(stringResource(R.string.cross_section), Icons.Default.Stairs) { /* TODO */ },
     )
 
     Scaffold(
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             TopAppBar(
                 title = { Text(stringResource(R.string.measurement)) },
@@ -126,7 +134,7 @@ fun MeasurementScreen(viewModel: GnssViewModel) {
                             horizontalAlignment = Alignment.CenterHorizontally,
                             modifier = Modifier.padding(4.dp)
                         ) {
-                            IconButton(onClick = { /* TODO */ }) {
+                            IconButton(onClick = action.action) {
                                 Icon(action.icon, contentDescription = action.title)
                             }
                             Text(text = action.title, style = MaterialTheme.typography.labelSmall)

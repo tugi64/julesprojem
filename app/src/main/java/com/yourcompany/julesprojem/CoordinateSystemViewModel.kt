@@ -1,46 +1,46 @@
 package com.yourcompany.julesprojem
 
-import android.app.Application
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
-class CoordinateSystemViewModel(application: Application) : AndroidViewModel(application) {
-
-    private val projectRepository = ProjectRepository(application.applicationContext)
+class CoordinateSystemViewModel : ViewModel() {
 
     var selectedDatum by mutableStateOf("ITRF96")
     var selectedProjection by mutableStateOf("UTM")
     var dom by mutableStateOf("")
 
-    fun saveCoordinateSystem() {
+    private var activeProject: Project? = null
+
+    init {
         viewModelScope.launch {
-            // This is a simplified implementation. In a real app, we would update the currently active project.
-            // For now, we'll just save a default project to demonstrate the functionality.
-            val defaultCoordSystem = CoordinateSystem(
-                name = "Default",
+            ProjectRepository.activeProject.collect { project ->
+                activeProject = project
+                project?.coordinateSystem?.let {
+                    selectedDatum = it.ellipsoid
+                    selectedProjection = it.projection
+                    dom = it.centralMeridian?.toString() ?: ""
+                }
+            }
+        }
+    }
+
+    fun saveCoordinateSystem() {
+        val projectToUpdate = activeProject ?: return
+
+        viewModelScope.launch {
+            val newCoordSystem = CoordinateSystem(
+                name = projectToUpdate.coordinateSystem.name,
                 ellipsoid = selectedDatum,
                 projection = selectedProjection,
                 centralMeridian = dom.toDoubleOrNull()
             )
-            val defaultProject = projectRepository.loadProject("Default") ?: Project("Default", defaultCoordSystem)
-            val updatedProject = defaultProject.copy(coordinateSystem = defaultCoordSystem)
-            projectRepository.saveProject(updatedProject)
-        }
-    }
-
-    @Suppress("UNCHECKED_CAST")
-    class CoordinateSystemViewModelFactory(private val application: Application) : ViewModelProvider.Factory {
-        override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            if (modelClass.isAssignableFrom(CoordinateSystemViewModel::class.java)) {
-                return CoordinateSystemViewModel(application) as T
-            }
-            throw IllegalArgumentException("Unknown ViewModel class")
+            val updatedProject = projectToUpdate.copy(coordinateSystem = newCoordSystem)
+            ProjectRepository.saveProject(updatedProject)
         }
     }
 }
