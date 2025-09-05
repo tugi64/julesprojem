@@ -9,27 +9,33 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.yourcompany.julesprojem.ui.theme.JulesprojemTheme
+
+@Composable
+fun GnssConnectionRoute(
+    viewModel: GnssViewModel = viewModel(
+        factory = GnssViewModel.GnssViewModelFactory(
+            BluetoothService(LocalContext.current.applicationContext),
+            NtripClient()
+        )
+    )
+) {
+    GnssConnectionScreen(
+        uiState = viewModel,
+        onConnectClicked = { viewModel.onConnectClicked() }
+    )
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun GnssConnectionScreen() {
-    var selectedManufacturer by remember { mutableStateOf("South") }
-    var selectedModel by remember { mutableStateOf("ALPS2") }
-    var bluetoothDevice by remember { mutableStateOf("HC-05") }
-    var rtkMode by remember { mutableStateOf("RTK") }
-    var corsHost by remember { mutableStateOf("") }
-    var corsPort by remember { mutableStateOf("") }
-    var corsUser by remember { mutableStateOf("") }
-    var corsPass by remember { mutableStateOf("") }
-
-    val manufacturers = listOf("South", "Trimble", "Topcon", "Hi-Target", "Sokkia", "Leica")
-    val models = listOf("ALPS2", "G1", "G6")
-    val bluetoothDevices = listOf("HC-05", "BT-123", "GNSS-ROVER-XYZ")
-    val rtkModes = listOf("RTK", "PPK")
-
+fun GnssConnectionScreen(
+    uiState: GnssUiState,
+    onConnectClicked: () -> Unit
+) {
     Scaffold(
         topBar = {
             TopAppBar(
@@ -54,23 +60,23 @@ fun GnssConnectionScreen() {
                     Spacer(modifier = Modifier.height(16.dp))
                     DropdownSelector(
                         label = "Üretici",
-                        options = manufacturers,
-                        selectedOption = selectedManufacturer,
-                        onOptionSelected = { selectedManufacturer = it }
+                        options = uiState.manufacturers,
+                        selectedOption = uiState.selectedManufacturer,
+                        onOptionSelected = { uiState.selectedManufacturer = it }
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     DropdownSelector(
                         label = "Model",
-                        options = models,
-                        selectedOption = selectedModel,
-                        onOptionSelected = { selectedModel = it }
+                        options = uiState.models,
+                        selectedOption = uiState.selectedModel,
+                        onOptionSelected = { uiState.selectedModel = it }
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     DropdownSelector(
                         label = "Bluetooth Cihazı",
-                        options = bluetoothDevices,
-                        selectedOption = bluetoothDevice,
-                        onOptionSelected = { bluetoothDevice = it }
+                        options = uiState.bluetoothDevices.value,
+                        selectedOption = uiState.selectedBluetoothDevice,
+                        onOptionSelected = { uiState.selectedBluetoothDevice = it }
                     )
                 }
             }
@@ -83,9 +89,9 @@ fun GnssConnectionScreen() {
                     Spacer(modifier = Modifier.height(16.dp))
                     DropdownSelector(
                         label = "Mod",
-                        options = rtkModes,
-                        selectedOption = rtkMode,
-                        onOptionSelected = { rtkMode = it }
+                        options = uiState.rtkModes,
+                        selectedOption = uiState.rtkMode,
+                        onOptionSelected = { uiState.rtkMode = it }
                     )
                 }
             }
@@ -96,13 +102,13 @@ fun GnssConnectionScreen() {
                 Column(modifier = Modifier.padding(16.dp)) {
                     Text("CORS (NTRIP) Ayarları", style = MaterialTheme.typography.titleMedium)
                     Spacer(modifier = Modifier.height(16.dp))
-                    OutlinedTextField(value = corsHost, onValueChange = { corsHost = it }, label = { Text("Host") }, modifier = Modifier.fillMaxWidth())
+                    OutlinedTextField(value = uiState.corsHost, onValueChange = { uiState.corsHost = it }, label = { Text("Host") }, modifier = Modifier.fillMaxWidth())
                     Spacer(modifier = Modifier.height(8.dp))
-                    OutlinedTextField(value = corsPort, onValueChange = { corsPort = it }, label = { Text("Port") }, modifier = Modifier.fillMaxWidth())
+                    OutlinedTextField(value = uiState.corsPort, onValueChange = { uiState.corsPort = it }, label = { Text("Port") }, modifier = Modifier.fillMaxWidth())
                     Spacer(modifier = Modifier.height(8.dp))
-                    OutlinedTextField(value = corsUser, onValueChange = { corsUser = it }, label = { Text("Kullanıcı Adı") }, modifier = Modifier.fillMaxWidth())
+                    OutlinedTextField(value = uiState.corsUser, onValueChange = { uiState.corsUser = it }, label = { Text("Kullanıcı Adı") }, modifier = Modifier.fillMaxWidth())
                     Spacer(modifier = Modifier.height(8.dp))
-                    OutlinedTextField(value = corsPass, onValueChange = { corsPass = it }, label = { Text("Şifre") }, modifier = Modifier.fillMaxWidth())
+                    OutlinedTextField(value = uiState.corsPass, onValueChange = { uiState.corsPass = it }, label = { Text("Şifre") }, modifier = Modifier.fillMaxWidth())
                 }
             }
             Spacer(modifier = Modifier.height(16.dp))
@@ -113,13 +119,29 @@ fun GnssConnectionScreen() {
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text("Durum: Bağlı Değil", style = MaterialTheme.typography.bodyLarge)
-                Button(onClick = { /* TODO: Implement connection logic */ }) {
+                Text("Durum: ${uiState.connectionStatus}", style = MaterialTheme.typography.bodyLarge)
+                Button(onClick = onConnectClicked) {
                     Text("BAĞLAN")
                 }
             }
         }
     }
+}
+
+interface GnssUiState {
+    var selectedManufacturer: String
+    var selectedModel: String
+    var selectedBluetoothDevice: String
+    var rtkMode: String
+    var corsHost: String
+    var corsPort: String
+    var corsUser: String
+    var corsPass: String
+    val connectionStatus: String
+    val manufacturers: List<String>
+    val models: List<String>
+    val bluetoothDevices: State<List<String>>
+    val rtkModes: List<String>
 }
 
 @Composable
@@ -162,11 +184,29 @@ fun DropdownSelector(
     }
 }
 
+class FakeGnssUiState : GnssUiState {
+    override var selectedManufacturer by mutableStateOf("Fake Manufacturer")
+    override var selectedModel by mutableStateOf("Fake Model")
+    override var selectedBluetoothDevice by mutableStateOf("Fake BT")
+    override var rtkMode by mutableStateOf("RTK")
+    override var corsHost by mutableStateOf("fake.host.com")
+    override var corsPort by mutableStateOf("2101")
+    override var corsUser by mutableStateOf("fakeuser")
+    override var corsPass by mutableStateOf("fakepass")
+    override val connectionStatus by mutableStateOf("Not Connected")
+    override val manufacturers = listOf("Fake Manufacturer", "Another Fake")
+    override val models = listOf("Fake Model 1", "Fake Model 2")
+    override val bluetoothDevices = mutableStateOf(listOf("Fake BT 1", "Fake BT 2"))
+    override val rtkModes = listOf("RTK", "PPK")
+}
 
 @Preview(showBackground = true)
 @Composable
 fun GnssConnectionScreenPreview() {
     JulesprojemTheme {
-        GnssConnectionScreen()
+        GnssConnectionScreen(
+            uiState = FakeGnssUiState(),
+            onConnectClicked = {}
+        )
     }
 }
