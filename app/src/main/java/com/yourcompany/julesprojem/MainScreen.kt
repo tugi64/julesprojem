@@ -11,40 +11,33 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
-import com.yourcompany.julesprojem.ui.theme.JulesprojemTheme
+
+data class MenuItem(
+    val title: String,
+    val icon: ImageVector,
+    val route: String
+)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen(navController: NavController) {
     val menuItems = listOf(
-        MenuItem(stringResource(R.string.gnss_connection), Icons.Default.Satellite, "gnss"),
-        MenuItem(stringResource(R.string.measurement), Icons.Default.MyLocation, "measurement"),
-        MenuItem(stringResource(R.string.application), Icons.Default.PinDrop, "application"),
-        MenuItem(stringResource(R.string.coordinate_system), Icons.Default.Public, "coords"),
-        MenuItem(stringResource(R.string.map_layers), Icons.Default.Layers, "layers"),
-        MenuItem(stringResource(R.string.drone_lidar), Icons.Default.AirplanemodeActive, "lidar"),
-        MenuItem(stringResource(R.string.radio_settings), Icons.Default.SettingsInputAntenna, "radio"),
-        MenuItem(stringResource(R.string.file_management), Icons.Default.Folder, "files")
+        MenuItem("Survey", Icons.Default.MyLocation, "measurement"),
+        MenuItem("Stakeout", Icons.Default.PinDrop, "application"),
+        MenuItem("File Management", Icons.Default.Folder, "files")
     )
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(stringResource(R.string.app_name)) },
+                title = { Text("Tugis GNSS") },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primaryContainer,
                     titleContentColor = MaterialTheme.colorScheme.primary,
-                ),
-                actions = {
-                    IconButton(onClick = { navController.navigate("settings") }) {
-                        Icon(Icons.Default.Settings, contentDescription = stringResource(R.string.settings))
-                    }
-                }
+                )
             )
         }
     ) { paddingValues ->
@@ -87,13 +80,5 @@ fun MenuItemCard(item: MenuItem, onClick: () -> Unit) {
             Spacer(modifier = Modifier.height(8.dp))
             Text(text = item.title, style = MaterialTheme.typography.titleMedium)
         }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun MainScreenPreview() {
-    JulesprojemTheme {
-        MainScreen(rememberNavController())
     }
 }

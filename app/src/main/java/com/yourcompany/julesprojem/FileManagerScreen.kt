@@ -9,17 +9,13 @@ import androidx.compose.material.icons.filled.CreateNewFolder
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Folder
 import androidx.compose.material.icons.filled.LocationOn
-import androidx.compose.material.icons.filled.PinDrop
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.yourcompany.julesprojem.ui.theme.JulesprojemTheme
+import com.yourcompany.julesprojem.coords.CoordinateSystemManager
 
 @Composable
 fun FileManagerRoute(
@@ -28,13 +24,9 @@ fun FileManagerRoute(
 ) {
     FileManagerScreen(
         viewModel = viewModel,
-        onStakeoutClicked = { point ->
-            ProjectRepository.setStakeoutTarget(point)
-            navController.navigate("application")
-        }
+        onStakeoutClicked = { /* TODO */ }
     )
 }
-
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -51,24 +43,21 @@ fun FileManagerScreen(
             TopAppBar(
                 title = {
                     Column {
-                        Text(stringResource(R.string.file_management))
+                        Text("File Management")
                         activeProject?.let {
+                            val crsName = CoordinateSystemManager.findCrsById(it.crsId)?.name ?: it.crsId
                             Text(
-                                text = stringResource(R.string.active_project, it.name),
+                                text = "Active: ${it.name} ($crsName)",
                                 style = MaterialTheme.typography.bodySmall
                             )
                         }
                     }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-                    titleContentColor = MaterialTheme.colorScheme.primary,
-                )
+                }
             )
         },
         floatingActionButton = {
             FloatingActionButton(onClick = { showNewProjectDialog = true }) {
-                Icon(Icons.Default.CreateNewFolder, contentDescription = stringResource(R.string.new_project))
+                Icon(Icons.Default.CreateNewFolder, contentDescription = "New Project")
             }
         }
     ) { paddingValues ->
@@ -76,60 +65,46 @@ fun FileManagerScreen(
             if (showNewProjectDialog) {
                 NewProjectDialog(
                     onDismiss = { showNewProjectDialog = false },
-                    onCreate = { projectName ->
-                        viewModel.createNewProject(projectName)
+                    onCreate = { projectName, crsId ->
+                        viewModel.createNewProject(projectName, crsId)
                         showNewProjectDialog = false
                     }
                 )
             }
 
             if (activeProject == null) {
-                Text("Lütfen bir proje açın veya oluşturun.")
+                Text("Please open or create a project.")
             } else {
                 LazyColumn {
                     item {
-                        Text("Proje Noktaları", style = MaterialTheme.typography.titleMedium)
+                        Text("Project Points", style = MaterialTheme.typography.titleMedium)
                         Spacer(modifier = Modifier.height(8.dp))
                     }
                     items(activeProject!!.points) { point ->
                         ListItem(
                             headlineContent = { Text(point.name) },
-                            supportingContent = { Text("N: ${point.northing}, E: ${point.easting}, H: ${point.elevation}")},
-                            leadingContent = {
-                                Icon(
-                                    Icons.Default.LocationOn,
-                                    contentDescription = "Nokta"
-                                )
+                            supportingContent = {
+                                Text("Lat: %.6f, Lon: %.6f, Alt: %.2f".format(point.latitude, point.longitude, point.altitude))
                             },
-                            trailingContent = {
-                                Row {
-                                    IconButton(onClick = { onStakeoutClicked(point) }) {
-                                        Icon(Icons.Default.PinDrop, contentDescription = "Aplikasyon")
-                                    }
-                                    IconButton(onClick = { /* TODO: Delete Point */ }) {
-                                        Icon(Icons.Default.Delete, contentDescription = stringResource(R.string.delete))
-                                    }
-                                }
+                            leadingContent = {
+                                Icon(Icons.Default.LocationOn, contentDescription = "Point")
                             }
                         )
                     }
                     item {
-                        Divider(modifier = Modifier.padding(vertical = 16.dp))
-                        Text("Tüm Projeler", style = MaterialTheme.typography.titleMedium)
+                        HorizontalDivider(modifier = Modifier.padding(vertical = 16.dp))
+                        Text("All Projects", style = MaterialTheme.typography.titleMedium)
                         Spacer(modifier = Modifier.height(8.dp))
                     }
                     items(projects) { projectName ->
                         ListItem(
                             headlineContent = { Text(projectName) },
                             leadingContent = {
-                                Icon(
-                                    Icons.Default.Folder,
-                                    contentDescription = stringResource(R.string.project_files)
-                                )
+                                Icon(Icons.Default.Folder, contentDescription = "Project")
                             },
                             trailingContent = {
                                 IconButton(onClick = { viewModel.deleteProject(projectName) }) {
-                                    Icon(Icons.Default.Delete, contentDescription = stringResource(R.string.delete))
+                                    Icon(Icons.Default.Delete, contentDescription = "Delete")
                                 }
                             },
                             modifier = Modifier.clickable { viewModel.openProject(projectName) }
@@ -141,48 +116,74 @@ fun FileManagerScreen(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun NewProjectDialog(
     onDismiss: () -> Unit,
-    onCreate: (String) -> Unit
+    onCreate: (String, String) -> Unit
 ) {
     var projectName by remember { mutableStateOf("") }
+    val crsOptions = remember { CoordinateSystemManager.predefinedSystems }
+    var expanded by remember { mutableStateOf(false) }
+    var selectedCrs by remember { mutableStateOf(crsOptions.first()) }
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text(stringResource(R.string.create_new_project)) },
+        title = { Text("Create New Project") },
         text = {
-            OutlinedTextField(
-                value = projectName,
-                onValueChange = { projectName = it },
-                label = { Text(stringResource(R.string.project_name)) },
-                singleLine = true
-            )
+            Column {
+                OutlinedTextField(
+                    value = projectName,
+                    onValueChange = { projectName = it },
+                    label = { Text("Project Name") },
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth()
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+                ExposedDropdownMenuBox(
+                    expanded = expanded,
+                    onExpandedChange = { expanded = !expanded }
+                ) {
+                    OutlinedTextField(
+                        value = selectedCrs.name,
+                        onValueChange = {},
+                        readOnly = true,
+                        label = { Text("Coordinate System") },
+                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+                        modifier = Modifier.menuAnchor().fillMaxWidth()
+                    )
+                    ExposedDropdownMenu(
+                        expanded = expanded,
+                        onDismissRequest = { expanded = false }
+                    ) {
+                        crsOptions.forEach { crs ->
+                            DropdownMenuItem(
+                                text = { Text(crs.name) },
+                                onClick = {
+                                    selectedCrs = crs
+                                    expanded = false
+                                }
+                            )
+                        }
+                    }
+                }
+            }
         },
         confirmButton = {
             Button(
                 onClick = {
                     if (projectName.isNotBlank()) {
-                        onCreate(projectName)
+                        onCreate(projectName, selectedCrs.id)
                     }
                 }
             ) {
-                Text(stringResource(R.string.create))
+                Text("Create")
             }
         },
         dismissButton = {
             Button(onClick = onDismiss) {
-                Text(stringResource(R.string.cancel))
+                Text("Cancel")
             }
         }
     )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun FileManagerScreenPreview() {
-    JulesprojemTheme {
-        // Can't preview this screen easily as it depends on a ViewModel with context
-        // FileManagerScreen(viewModel = ...)
-    }
 }

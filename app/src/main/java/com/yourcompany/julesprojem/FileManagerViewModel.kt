@@ -3,11 +3,12 @@ package com.yourcompany.julesprojem
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
 
 class FileManagerViewModel : ViewModel() {
 
     private val _projects = MutableStateFlow<List<String>>(emptyList())
-    val projects: StateFlow<List<String>> = _projects
+    val projects: StateFlow<List<String>> = _projects.asStateFlow()
 
     val activeProject: StateFlow<Project?> = ProjectRepository.activeProject
 
@@ -16,12 +17,14 @@ class FileManagerViewModel : ViewModel() {
     }
 
     private fun loadProjects() {
-        _projects.value = ProjectRepository.listProjects()
+        viewModelScope.launch {
+            _projects.value = ProjectRepository.listProjects()
+        }
     }
 
-    fun createNewProject(projectName: String) {
-        val defaultCoordSystem = CoordinateSystem("WGS84", "WGS84", "UTM")
-        val newProject = Project(name = projectName, coordinateSystem = defaultCoordSystem)
+    fun createNewProject(projectName: String, crsId: String) {
+        if (projectName.isBlank()) return
+        val newProject = Project(name = projectName, crsId = crsId)
         ProjectRepository.saveProject(newProject)
         loadProjects() // Refresh the list
         openProject(projectName)

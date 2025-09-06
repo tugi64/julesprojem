@@ -1,10 +1,16 @@
 package com.yourcompany.julesprojem
 
 import android.app.Application
+import android.content.Context
 
 class TugisGnssApplication : Application() {
     override fun onCreate() {
         super.onCreate()
-        ProjectRepository.init(this)
+        appContext = applicationContext
+    }
+
+    companion object {
+        lateinit var appContext: Context
+            private set
     }
 }

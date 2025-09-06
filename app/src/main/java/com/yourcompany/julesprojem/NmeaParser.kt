@@ -25,13 +25,12 @@ class NmeaParser {
         val data = parts[0]
         val checksum = parts[1]
 
-        // Validate checksum
         var calculatedChecksum = 0
         for (char in data) {
             calculatedChecksum = calculatedChecksum xor char.code
         }
-        if (checksum != String.format("%02X", calculatedChecksum)) {
-            return null // Invalid checksum
+        if (checksum.toIntOrNull(16) != calculatedChecksum) {
+             return null // Invalid checksum
         }
 
         val fields = data.split(",")
@@ -59,19 +58,14 @@ class NmeaParser {
     }
 
     private fun ddmToDecimal(ddm: String, direction: String): Double? {
-        if (ddm.isBlank()) return null
+        if (ddm.isBlank() || !ddm.contains(".")) return null
         try {
-            val degrees: Double
-            val minutes: Double
-            if (ddm.contains(".")) {
-                val pointIndex = ddm.indexOf('.')
-                val degPart = ddm.substring(0, pointIndex - 2)
-                val minPart = ddm.substring(pointIndex - 2)
-                degrees = degPart.toDouble()
-                minutes = minPart.toDouble()
-            } else {
-                return null // Invalid format
-            }
+            val pointIndex = ddm.indexOf('.')
+            val degPart = ddm.substring(0, pointIndex - 2)
+            val minPart = ddm.substring(pointIndex - 2)
+
+            val degrees = degPart.toDouble()
+            val minutes = minPart.toDouble()
 
             var decimal = degrees + minutes / 60.0
             if (direction == "S" || direction == "W") {

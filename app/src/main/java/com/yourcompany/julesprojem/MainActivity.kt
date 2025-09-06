@@ -2,17 +2,17 @@ package com.yourcompany.julesprojem
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
-import android.Manifest
-import android.os.Build
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import android.Manifest
+import android.os.Build
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -29,9 +29,9 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        LanguageManager.loadLocale(this)
         enableEdgeToEdge()
 
+        // Request permissions
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             requestMultiplePermissions.launch(
                 arrayOf(
@@ -54,18 +54,10 @@ class MainActivity : ComponentActivity() {
             JulesprojemTheme {
                 val navController = rememberNavController()
                 NavHost(navController = navController, startDestination = "main") {
-                    composable("main") {
-                        MainScreen(navController)
-                    }
-                    composable("gnss") { GnssConnectionRoute() }
+                    composable("main") { MainScreen(navController) }
+                    composable("files") { FileManagerRoute(navController) }
                     composable("measurement") { MeasurementRoute() }
                     composable("application") { ApplicationRoute() }
-                    composable("coords") { CoordinateSystemRoute() }
-                    composable("layers") { MapLayersScreen() }
-                    composable("lidar") { DroneLidarScreen() }
-                    composable("radio") { RadioSettingsScreen() }
-                    composable("files") { FileManagerRoute(navController) }
-                    composable("settings") { SettingsScreen() }
                 }
             }
         }

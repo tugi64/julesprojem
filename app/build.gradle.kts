@@ -52,12 +52,13 @@ dependencies {
     implementation(libs.androidx.material.icons.extended)
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
-    implementation(libs.osmdroid.android)
+
+    implementation(libs.proj4j.core)
+    implementation(libs.proj4j.epsg)
     implementation(libs.gson)
-    implementation(libs.androidx.appcompat)
+    implementation(libs.osmdroid.android)
+
     testImplementation(libs.junit)
-    testImplementation(libs.mockito.core)
-    testImplementation(libs.kotlinx.coroutines.test)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
