@@ -3,11 +3,13 @@ package com.yourcompany.julesprojem
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import java.io.InputStream
 
 class GnssViewModel(
     private val bluetoothService: BluetoothService,
@@ -15,27 +17,42 @@ class GnssViewModel(
 ) : ViewModel() {
 
     private val nmeaParser = NmeaParser()
+    private var dataStreamJob: Job? = null
 
     private val _ggaData = MutableStateFlow<GgaData?>(null)
     val ggaData = _ggaData.asStateFlow()
 
-    init {
-        // Start simulating a GNSS data stream
-        viewModelScope.launch {
-            while (isActive) {
-                // A sample $GPGGA sentence for Istanbul
-                val sampleNmea = "\$GPGGA,123519,4100.8385,N,02900.9329,E,1,08,0.9,545.4,M,46.9,M,,*47"
-                val parsedData = nmeaParser.parseGga(sampleNmea)
-                if (parsedData != null) {
-                    // Slightly vary the position to simulate movement
-                    _ggaData.value = parsedData.copy(
-                        latitude = parsedData.latitude + (Math.random() - 0.5) * 0.00001,
-                        longitude = parsedData.longitude + (Math.random() - 0.5) * 0.00001
-                    )
+    fun startDataStream(inputStream: InputStream) {
+        // Cancel any existing stream
+        stopDataStream()
+        dataStreamJob = viewModelScope.launch(Dispatchers.IO) {
+            try {
+                inputStream.bufferedReader().use { reader ->
+                    while (isActive) {
+                        val line = reader.readLine()
+                        if (line != null) {
+                            nmeaParser.parseGga(line)?.let {
+                                _ggaData.value = it
+                            }
+                        } else {
+                            // End of stream
+                            break
+                        }
+                    }
                 }
-                delay(1000) // Emit new data every second
+            } catch (e: Exception) {
+                // Handle exceptions, e.g., disconnection
+                e.printStackTrace()
+            } finally {
+                 // Optionally update a status a status here
             }
         }
+    }
+
+    fun stopDataStream() {
+        dataStreamJob?.cancel()
+        dataStreamJob = null
+        _ggaData.value = null // Clear data on disconnect
     }
 
     fun savePoint() {
@@ -51,6 +68,12 @@ class GnssViewModel(
 
         activeProject.points.add(newPoint)
         ProjectRepository.saveProject(activeProject)
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        stopDataStream()
+        bluetoothService.disconnect()
     }
 
     @Suppress("UNCHECKED_CAST")

@@ -1,18 +1,14 @@
 package com.yourcompany.julesprojem
 
+import android.Manifest
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import android.Manifest
-import android.os.Build
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -53,11 +49,29 @@ class MainActivity : ComponentActivity() {
         setContent {
             JulesprojemTheme {
                 val navController = rememberNavController()
+
+                // Create a single instance of GnssViewModel to be shared
+                val gnssViewModel: GnssViewModel = viewModel(
+                    factory = GnssViewModel.GnssViewModelFactory(
+                        BluetoothService(LocalContext.current.applicationContext),
+                        NtripClient()
+                    )
+                )
+
                 NavHost(navController = navController, startDestination = "main") {
                     composable("main") { MainScreen(navController) }
                     composable("files") { FileManagerRoute(navController) }
-                    composable("measurement") { MeasurementRoute() }
-                    composable("application") { ApplicationRoute() }
+                    composable("measurement") { MeasurementRoute(gnssViewModel) }
+                    composable("application") { ApplicationRoute(gnssViewModel) }
+                    composable("gnss") { GnssConnectionRoute(navController, gnssViewModel) }
+                    composable("crs_selection") {
+                        CrsSelectionScreen(navController) { selectedCrs ->
+                            // Set the result in the previous screen's saved state handle
+                            navController.previousBackStackEntry
+                                ?.savedStateHandle
+                                ?.set("selectedCrsId", selectedCrs.id)
+                        }
+                    }
                 }
             }
         }

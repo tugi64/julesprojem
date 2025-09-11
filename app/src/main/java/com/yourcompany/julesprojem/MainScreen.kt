@@ -25,6 +25,7 @@ data class MenuItem(
 @Composable
 fun MainScreen(navController: NavController) {
     val menuItems = listOf(
+        MenuItem("GNSS Connection", Icons.Default.Satellite, "gnss"),
         MenuItem("Survey", Icons.Default.MyLocation, "measurement"),
         MenuItem("Stakeout", Icons.Default.PinDrop, "application"),
         MenuItem("File Management", Icons.Default.Folder, "files")
