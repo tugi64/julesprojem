@@ -28,17 +28,17 @@ fun MainScreen(navController: NavController) {
         MenuItem("GNSS Connection", Icons.Default.Satellite, "gnss"),
         MenuItem("Survey", Icons.Default.MyLocation, "measurement"),
         MenuItem("Stakeout", Icons.Default.PinDrop, "application"),
-        MenuItem("File Management", Icons.Default.Folder, "files")
+        MenuItem("File Management", Icons.Default.Folder, "files"),
+        MenuItem("Map Layers", Icons.Default.Layers, "layers"),
+        MenuItem("Drone LiDAR", Icons.Default.AirplanemodeActive, "lidar"),
+        MenuItem("Radio Settings", Icons.Default.SettingsInputAntenna, "radio"),
+        MenuItem("Settings", Icons.Default.Settings, "settings")
     )
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Tugis GNSS") },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-                    titleContentColor = MaterialTheme.colorScheme.primary,
-                )
+                title = { Text("Tugis GNSS") }
             )
         }
     ) { paddingValues ->

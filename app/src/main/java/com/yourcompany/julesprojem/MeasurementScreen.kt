@@ -5,13 +5,13 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.viewinterop.AndroidView
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 import com.yourcompany.julesprojem.ui.components.GnssStatusHeader
 import kotlinx.coroutines.launch
 import org.osmdroid.config.Configuration
@@ -22,19 +22,21 @@ import org.osmdroid.views.overlay.Marker
 
 @Composable
 fun MeasurementRoute(
-    gnssViewModel: GnssViewModel = viewModel(
-        factory = GnssViewModel.GnssViewModelFactory(
-            BluetoothService(LocalContext.current.applicationContext),
-            NtripClient()
-        )
-    )
+    navController: NavController,
+    gnssViewModel: GnssViewModel
 ) {
-    MeasurementScreen(gnssViewModel)
+    MeasurementScreen(
+        viewModel = gnssViewModel,
+        onNavigateBack = { navController.popBackStack() }
+    )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MeasurementScreen(viewModel: GnssViewModel) {
+fun MeasurementScreen(
+    viewModel: GnssViewModel,
+    onNavigateBack: () -> Unit
+) {
     val ggaData by viewModel.ggaData.collectAsState()
     val activeProject by ProjectRepository.activeProject.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
@@ -44,7 +46,12 @@ fun MeasurementScreen(viewModel: GnssViewModel) {
         snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             TopAppBar(
-                title = { Text("Survey") }
+                title = { Text("Survey") },
+                navigationIcon = {
+                    IconButton(onClick = onNavigateBack) {
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                    }
+                }
             )
         },
         floatingActionButton = {

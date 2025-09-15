@@ -20,7 +20,7 @@ import androidx.navigation.NavController
 @Composable
 fun GnssConnectionRoute(
     navController: NavController,
-    gnssViewModel: GnssViewModel // Passed from a higher level
+    gnssViewModel: GnssViewModel
 ) {
     val factory = GnssConnectionViewModelFactory(BluetoothService(LocalContext.current.applicationContext), gnssViewModel)
     val connectionViewModel: GnssConnectionViewModel = viewModel(factory = factory)

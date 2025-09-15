@@ -24,13 +24,13 @@ import com.yourcompany.julesprojem.coords.CrsData
 import kotlinx.coroutines.launch
 import java.io.BufferedReader
 import java.io.InputStreamReader
+import androidx.compose.runtime.livedata.observeAsState
 
 @Composable
 fun FileManagerRoute(
     navController: NavController,
     viewModel: FileManagerViewModel = viewModel()
 ) {
-    // Listen for the result from CrsSelectionScreen
     val newCrsResult = navController.currentBackStackEntry
         ?.savedStateHandle
         ?.getLiveData<String>("selectedCrsId")
@@ -57,7 +57,6 @@ fun FileManagerScreen(
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
 
-    // ... (rest of the launchers remain the same) ...
     val importLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
@@ -115,7 +114,6 @@ fun FileManagerScreen(
             }
         }
     }
-
 
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) },
@@ -178,7 +176,6 @@ fun FileManagerScreen(
                 )
             }
 
-            // ... (rest of the screen layout remains the same) ...
             activeProject?.let { project ->
                 Text("Active Project: ${project.name} (${CoordinateSystemManager.findCrsById(project.crsId)?.name})", style = MaterialTheme.typography.titleMedium)
                 Spacer(modifier = Modifier.height(8.dp))
@@ -244,12 +241,10 @@ private fun NewProjectDialog(
     val defaultCrs = remember { CoordinateSystemManager.predefinedSystems.first() }
     var selectedCrs by remember { mutableStateOf(defaultCrs) }
 
-    // Update the selected CRS when we get a result back from the selection screen
     LaunchedEffect(newCrsResult) {
         newCrsResult?.value?.let { crsId ->
             CoordinateSystemManager.findCrsById(crsId)?.let {
                 selectedCrs = it
-                // Clear the result from the state handle so it's not reused
                 navController.currentBackStackEntry?.savedStateHandle?.remove<String>("selectedCrsId")
             }
         }

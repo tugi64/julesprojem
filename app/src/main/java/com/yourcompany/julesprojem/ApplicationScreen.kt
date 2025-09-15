@@ -4,14 +4,17 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 import com.yourcompany.julesprojem.ui.components.GnssStatusHeader
 import org.osmdroid.config.Configuration
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
@@ -22,22 +25,23 @@ import java.util.Locale
 
 @Composable
 fun ApplicationRoute(
-    gnssViewModel: GnssViewModel = viewModel(
-        factory = GnssViewModel.GnssViewModelFactory(
-            BluetoothService(LocalContext.current.applicationContext),
-            NtripClient()
-        )
-    ),
-    appViewModel: ApplicationViewModel = viewModel()
+    navController: NavController,
+    gnssViewModel: GnssViewModel
 ) {
-    ApplicationScreen(gnssViewModel, appViewModel)
+    val appViewModel: ApplicationViewModel = viewModel()
+    ApplicationScreen(
+        gnssViewModel = gnssViewModel,
+        appViewModel = appViewModel,
+        onNavigateBack = { navController.popBackStack() }
+    )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ApplicationScreen(
     gnssViewModel: GnssViewModel,
-    appViewModel: ApplicationViewModel
+    appViewModel: ApplicationViewModel,
+    onNavigateBack: () -> Unit
 ) {
     val ggaData by gnssViewModel.ggaData.collectAsState()
     val activeProject by ProjectRepository.activeProject.collectAsState()
@@ -51,7 +55,12 @@ fun ApplicationScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Stakeout") }
+                title = { Text("Stakeout") },
+                navigationIcon = {
+                    IconButton(onClick = onNavigateBack) {
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                    }
+                }
             )
         }
     ) { paddingValues ->
@@ -87,7 +96,6 @@ fun ApplicationScreen(
                             val targetMarker = Marker(mapView)
                             targetMarker.position = targetPoint
                             targetMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER)
-                            // Make target marker visually distinct
                             targetMarker.icon = mapView.context.getDrawable(org.osmdroid.library.R.drawable.marker_default_focused_base)
                             mapView.overlays.add(targetMarker)
                         }

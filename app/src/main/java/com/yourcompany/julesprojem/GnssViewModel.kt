@@ -23,7 +23,6 @@ class GnssViewModel(
     val ggaData = _ggaData.asStateFlow()
 
     fun startDataStream(inputStream: InputStream) {
-        // Cancel any existing stream
         stopDataStream()
         dataStreamJob = viewModelScope.launch(Dispatchers.IO) {
             try {
@@ -35,16 +34,12 @@ class GnssViewModel(
                                 _ggaData.value = it
                             }
                         } else {
-                            // End of stream
                             break
                         }
                     }
                 }
             } catch (e: Exception) {
-                // Handle exceptions, e.g., disconnection
                 e.printStackTrace()
-            } finally {
-                 // Optionally update a status a status here
             }
         }
     }
@@ -52,7 +47,7 @@ class GnssViewModel(
     fun stopDataStream() {
         dataStreamJob?.cancel()
         dataStreamJob = null
-        _ggaData.value = null // Clear data on disconnect
+        _ggaData.value = null
     }
 
     fun savePoint() {

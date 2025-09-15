@@ -27,7 +27,6 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
-        // Request permissions
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             requestMultiplePermissions.launch(
                 arrayOf(
@@ -50,7 +49,6 @@ class MainActivity : ComponentActivity() {
             JulesprojemTheme {
                 val navController = rememberNavController()
 
-                // Create a single instance of GnssViewModel to be shared
                 val gnssViewModel: GnssViewModel = viewModel(
                     factory = GnssViewModel.GnssViewModelFactory(
                         BluetoothService(LocalContext.current.applicationContext),
@@ -61,17 +59,20 @@ class MainActivity : ComponentActivity() {
                 NavHost(navController = navController, startDestination = "main") {
                     composable("main") { MainScreen(navController) }
                     composable("files") { FileManagerRoute(navController) }
-                    composable("measurement") { MeasurementRoute(gnssViewModel) }
-                    composable("application") { ApplicationRoute(gnssViewModel) }
+                    composable("measurement") { MeasurementRoute(navController, gnssViewModel) }
+                    composable("application") { ApplicationRoute(navController, gnssViewModel) }
                     composable("gnss") { GnssConnectionRoute(navController, gnssViewModel) }
                     composable("crs_selection") {
                         CrsSelectionScreen(navController) { selectedCrs ->
-                            // Set the result in the previous screen's saved state handle
                             navController.previousBackStackEntry
                                 ?.savedStateHandle
                                 ?.set("selectedCrsId", selectedCrs.id)
                         }
                     }
+                    composable("layers") { MapLayersScreen(navController) }
+                    composable("lidar") { DroneLidarScreen(navController) }
+                    composable("radio") { RadioSettingsScreen(navController) }
+                    composable("settings") { SettingsScreen(navController) }
                 }
             }
         }

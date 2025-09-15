@@ -2,6 +2,10 @@ package com.yourcompany.julesprojem
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.yourcompany.julesprojem.fileio.ImportExportManager
+import com.yourcompany.julesprojem.fileio.ImportResult
+import com.yourcompany.julesprojem.fileio.PointExporter
+import com.yourcompany.julesprojem.fileio.NcnExporter
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
@@ -26,7 +30,7 @@ class FileManagerViewModel : ViewModel() {
         if (projectName.isBlank()) return
         val newProject = Project(name = projectName, crsId = crsId)
         ProjectRepository.saveProject(newProject)
-        loadProjects() // Refresh the list
+        loadProjects()
         openProject(projectName)
     }
 
@@ -36,7 +40,7 @@ class FileManagerViewModel : ViewModel() {
 
     fun deleteProject(projectName: String) {
         ProjectRepository.deleteProject(projectName)
-        loadProjects() // Refresh the list
+        loadProjects()
     }
 
     fun importPoints(fileContent: String, fileExtension: String): String {
@@ -45,19 +49,19 @@ class FileManagerViewModel : ViewModel() {
             return "No active project. Please create or open a project first."
         }
 
-        val result = com.yourcompany.julesprojem.fileio.ImportExportManager.importPoints(
+        val result = ImportExportManager.importPoints(
             fileContent,
             fileExtension,
             project.crsId
         )
 
         return when (result) {
-            is com.yourcompany.julesprojem.fileio.ImportResult.Success -> {
+            is ImportResult.Success -> {
                 project.points.addAll(result.points)
                 ProjectRepository.saveProject(project)
                 "${result.points.size} points imported successfully."
             }
-            is com.yourcompany.julesprojem.fileio.ImportResult.Error -> {
+            is ImportResult.Error -> {
                 result.message
             }
         }
@@ -65,11 +69,11 @@ class FileManagerViewModel : ViewModel() {
 
     fun exportPointsAsCsv(): String? {
         val project = activeProject.value ?: return null
-        return com.yourcompany.julesprojem.fileio.PointExporter.exportAsCsv(project.points, project.crsId)
+        return PointExporter.exportAsCsv(project.points, project.crsId)
     }
 
     fun exportPointsAsNcn(): String? {
         val project = activeProject.value ?: return null
-        return com.yourcompany.julesprojem.fileio.NcnExporter.exportAsNcn(project.points, project.crsId)
+        return NcnExporter.exportAsNcn(project.points, project.crsId)
     }
 }

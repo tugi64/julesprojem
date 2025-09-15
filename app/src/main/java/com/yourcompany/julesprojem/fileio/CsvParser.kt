@@ -10,7 +10,6 @@ object CsvParser {
         val points = mutableListOf<Point>()
         val lines = fileContent.lines().filter { it.isNotBlank() }
 
-        // Get the inverse transformation from the project CRS to WGS84
         val transform = CoordinateSystemManager.getInverseTransform(crsId)
             ?: return ImportResult.Error("Could not create inverse transformation for CRS: $crsId")
 
@@ -27,7 +26,6 @@ object CsvParser {
                 val z = fields[3].toDouble()
                 val code = fields.getOrNull(4) ?: ""
 
-                // Perform inverse transformation
                 val sourceCoord = ProjCoordinate(x, y, z)
                 val targetCoord = ProjCoordinate()
                 transform.transform(sourceCoord, targetCoord)
@@ -39,7 +37,6 @@ object CsvParser {
                 points.add(
                     Point(
                         name = name,
-                        // Note: Proj4J returns Lon, Lat
                         longitude = targetCoord.x,
                         latitude = targetCoord.y,
                         altitude = targetCoord.z,

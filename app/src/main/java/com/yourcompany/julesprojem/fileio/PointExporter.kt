@@ -31,14 +31,10 @@ object PointExporter {
                 )
                 rows.add(row)
             } else {
-                // Handle case where transformation fails for a point
-                // Optionally log this error or notify user
-                // For now, we'll just skip the point
                 println("Warning: Could not transform point ${point.name} to CRS $crsId. It will not be exported.")
             }
         }
 
-        // If only the header is present, it means no points were successfully exported
         if (rows.size <= 1) {
             return null
         }

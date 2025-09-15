@@ -13,7 +13,6 @@ object ProjectRepository {
     private val _activeProject = MutableStateFlow<Project?>(null)
     val activeProject = _activeProject.asStateFlow()
 
-    // Added for stakeout functionality
     private val _stakeoutTarget = MutableStateFlow<Point?>(null)
     val stakeoutTarget = _stakeoutTarget.asStateFlow()
 
@@ -26,7 +25,6 @@ object ProjectRepository {
     fun saveProject(project: Project) {
         val projectFile = File(projectsDir, "${project.name}.json")
         projectFile.writeText(gson.toJson(project))
-        // If the saved project is the active one, update the flow
         if (_activeProject.value?.name == project.name) {
             _activeProject.value = project
         }

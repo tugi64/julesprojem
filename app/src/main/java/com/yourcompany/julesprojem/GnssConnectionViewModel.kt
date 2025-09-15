@@ -12,7 +12,7 @@ import java.io.InputStream
 @SuppressLint("MissingPermission")
 class GnssConnectionViewModel(
     private val bluetoothService: BluetoothService,
-    private val gnssViewModel: GnssViewModel // To pass the stream to the main VM
+    private val gnssViewModel: GnssViewModel
 ) : ViewModel() {
 
     private val _pairedDevices = mutableStateListOf<Pair<String, String>>()
@@ -47,7 +47,6 @@ class GnssConnectionViewModel(
             _isScanning.value = true
             _scannedDevices.clear()
             bluetoothService.startDiscovery { device ->
-                // Avoid duplicates
                 if (_scannedDevices.none { it.second == device.address } && _pairedDevices.none { it.second == device.address }) {
                     _scannedDevices.add((device.name ?: "Unknown Device") to device.address)
                 }
@@ -68,7 +67,6 @@ class GnssConnectionViewModel(
             result.onSuccess { inputStream ->
                 _connectionStatus.value = "Connected. Starting data stream..."
                 gnssViewModel.startDataStream(inputStream)
-                // The main GnssViewModel will now handle the data
             }.onFailure { error ->
                 _connectionStatus.value = "Connection failed: ${error.message}"
             }
